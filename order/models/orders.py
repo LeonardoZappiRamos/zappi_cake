@@ -4,8 +4,9 @@ from django.contrib.auth.models import User
 from product.models import Product
 
 class Order(models.Model):
-    products = models.ManyToManyField(Product, on_delete=models.CASCADE)
+    products = models.ManyToManyField(Product, blank=False)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
     
     class Meta:
         ordering = ['-created_at']

@@ -11,5 +11,5 @@ class Category(models.Model):
     class Meta:
         ordering = ['name']
     
-    def __str__(self):
+    def __unicode__(self):
         return self.name
