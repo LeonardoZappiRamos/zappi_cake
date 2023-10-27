@@ -13,7 +13,7 @@ class CategoryFactory(factory.django.DjangoModelFactory):
 
 class ProductFactory(factory.django.DjangoModelFactory):
     name = factory.Faker('pystr')
-    price = factory.Faker('pystr')
+    price = factory.Faker('pyint', min_value=0, max_value=1000)
     is_active = factory.Iterator([True, False])
     category = factory.LazyAttribute(CategoryFactory)
     
