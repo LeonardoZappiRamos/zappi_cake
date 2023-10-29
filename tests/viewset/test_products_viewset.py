@@ -12,25 +12,25 @@ from product.models import Product
 class TestProductViewSet(APITestCase):
     client = APIClient()
     
-    def setUp(self):
+    def setUp(self):        
         self.product = ProductFactory(
             name='Netbook',
             price= 2500.00,   
         )
 
-    def test_get_products(self):
+    def test_get_products(self):        
         response = self.client.get(
             reverse('product-list', kwargs={'version': 'v1'}),
         )
         
         product = json.loads(response.content)
-        self.assertEqual(product[0]['name'], self.product.name)
-        self.assertEqual(product[0]['price'], '{0:.2f}'.format(self.product.price))
-        self.assertEqual(product[0]['is_active'], self.product.is_active)
+        self.assertEqual(product['results'][0]['name'], self.product.name)
+        self.assertEqual(product['results'][0]['price'], '{0:.2f}'.format(self.product.price))
+        self.assertEqual(product['results'][0]['is_active'], self.product.is_active)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
-    def test_add_products(self):
+    def test_add_products(self):        
         category = CategoryFactory()
         
         data = json.dumps({
@@ -45,8 +45,8 @@ class TestProductViewSet(APITestCase):
             data=data,
             content_type='application/json'
         )
-                
-        created_product = Product.objects.get(name= 'Aparador de Onda')
+        
+        created_product = Product.objects.get(name= "Aparador de Onda")
         
         self.assertEquals(response.status_code, status.HTTP_201_CREATED)
         self.assertEquals(created_product.name, 'Aparador de Onda')
