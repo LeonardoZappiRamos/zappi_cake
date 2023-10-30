@@ -3,19 +3,22 @@ import json
 
 from rest_framework.test import APIClient, APITestCase
 from rest_framework.views import status
+from rest_framework.authtoken.models import Token
 
 from django.urls import reverse
 
 from product.factories import ProductFactory, CategoryFactory
 from order.factories import OrderFactory, UserFactory
-from product.models import Product
 from order.models import Order
 
-class TestProductViewSet(APITestCase):
+class TestOrderViewSet(APITestCase):
     client = APIClient()
     
     def setUp(self):
         self.user = UserFactory()
+        
+        token = Token.objects.create(user= self.user)
+        token.save()
         
         self.category = CategoryFactory(name="technology")
         
@@ -28,19 +31,24 @@ class TestProductViewSet(APITestCase):
         )
     
     def test_get_order(self):
+        token = Token.objects.get(user__username = self.user.username)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        
         response = self.client.get(
             reverse('order-list', kwargs={'version': 'v1'}),
         )
         
         order = json.loads(response.content)
         
-        self.assertEqual(len(order[0]['products']), 2)
-        
-        self.assertEqual(order[0]['user'], 1)
+        self.assertEqual(len(order['results'][0]['products']), 2)
+        self.assertEqual(order['results'][0]['user'], 1)
         
         self.assertEqual(response.status_code, status.HTTP_200_OK)
     
     def test_create_order(self):
+        token = Token.objects.get(user__username = self.user.username)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + token.key)
+        
         user = UserFactory()
         product = ProductFactory(name="mouse", description="new mouse", price=50)
         data = json.dumps({
